@@ -1,0 +1,41 @@
+Weather Forecast with PixieDust
+
+This notebook shows how to:
+
+use the Weather Company Data API to get weather forecast json data based on latitude and longitude
+convert this json data into a pandas DataFrame
+create a weather chart and map with matplotlib
+create a weather chart and map with PixieDust
+Before running the notebook:
+
+Sign up for a free 30-day trial Bluemix account
+Launch the Weather Data service in Bluemix and fill in the credentials below. Learn more here
+Run this notebook locally or in the Cloud using the IBM Data Science Experience
+1. Load and install packages
+
+First, uncomment the lines in the below cell and upgrade the pixiedust and bokeh packages. When this is done restart the kernel. You have to do this only once, or when there is an update available.
+
+Then import the package needed to run this notebook.
+
+2. Get weather data
+
+Find the latitude and longitude of your current location by running this magic javascript cell. Then fill in your Weather Company API credentials to load the weather forecast for where you are.
+
+Wait a few seconds to run the second cell to allow the above geolocation function to run. Or provide the lat and lon of the location you want to get a weather forecast for.
+
+Uncomment and run the next cell to have a look what the json data file looks like.
+
+Convert the data into a DataFrame with each timestep on a new row. Convert the timestamp into a datetime format and drop the columns that are not needed. See this Cheat sheet for date format conversions. Finally, convert the data type into numeric.
+
+You may have to change to format of the time to your time zone '%Y-%m-%dT%H:%M:%S+0200' for Europe or '%Y-%m-%dT%H:%M:%S+0100' for the UK during summer time for example.
+
+As there seems to be an issue with the pop column (percentage of precipitation), create a new column rain.
+
+4. Plot data with matplotlib
+
+5. Create a temperature map for the UK
+
+
+6. Plot data with PixieDust
+
+https://ibm-cds-labs.github.io/pixiedust/

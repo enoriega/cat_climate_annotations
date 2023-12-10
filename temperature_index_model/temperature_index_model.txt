@@ -1,0 +1,105 @@
+Temperature index models
+Goals of this notebook:
+
+Gain a basic understanding of temperature index models
+Implement OGGM's temperature index model for a glacier of interest
+This version of the notebook works for OGGM versions before 1.6. We will keep this notebook here for a while longer (e.g.: for classroom.oggm.org), and we will replace it with an updated notebook at a later stage. If you are running OGGM 1.6, you should ignore this notebook.
+
+Some settings:
+
+Background
+Glacier melt significantly influences catchment hydrology. Hence, it is useful to have accurate predictions of runoff from glacierized areas. Generally, there are two classes of melt models:
+
+energy balance models
+temperature index models
+Energy balance models are physical models quantifying melt as the residual of the energy balance equation. These models require measurements of net radiation, wind speed, temperature and surface properties to predict melt. On a glacier, spatially well resolved measurements are demanding and hard to maintain. Hence, a simpler model, the temperature index model, is the most common approach to model glacier melt.
+
+Temperature index models assume an empirical relationship between air temperatures and melt rates and are a simplification of the energy balance models. The reasoning is that melt is predominantly influenced by the longwave atmospheric radiation and the sensible heat flux - energy balance components that are highly influenced by air temperature (Hock, 2003). The main reason(s) why temperature index models are commonly used are the wide availability of air temperature measurements and computational efficiency.
+
+Model setup
+The simplest temperature index model relates the amount of ice or snow melt M (mm) to the sum of positive air temperatures T+ (∘C) by a proportionality factor DDF, the degree-day factor, for each n time intervals Δt:
+
+n∑i M = DDF n∑i T+Δt
+
+Commonly, Δt=1 day is used - hence the name degree-day factor. However, any other time interval Δt, e.g. hourly or monthly, can be used to determine DDF. In practice, the model requires measurements of air temperature and glacier mass balance to estimate DDF - once calculated, DDF can be used to predict melt by only measuring air temperature (Hock, 2003). However, this temperature index model, also called degree-day model, is not able to predict glacier surface mass balance.
+
+To model glacier surface mass balance, a more sophisticated temperature index model was developed by Marzeion et al., (2012). The monthly mass balance Bi at elevation z is computed as
+
+Bi(z) = Psolidi(z) − μ∗max(Ti(z)−Tmelt,0) − ϵ
+
+where PSolidi is the monthly solid precipitation, Ti the monthly average temperature, TMelt the monthly average temperature above which ice melt is assumed and ϵ the residual. ϵ is assumed to be a random error taking account for uncertainties associated with unresolved physical processes. μ∗ is the temperature sensitivity of the glacier and it depends on many parameters, mostly glacier specific (e.g., avalanches, topographical shading, cloudiness, ...).
+
+Degrees of freedom
+Among others, the temperature sensitivity μ∗, the threshold for melt TMelt and the implicit threshold for solid precipitation TSolid are important degrees of freedom of the model - TSolid is the monthly average temperature below which precipitation is assumed to be solid.
+
+Generally, TMelt and TSolid can vary both spatially and temporally on a specific glacier. However, commonly the two thresholds TMelt and TSolid are assumed to be constant. TMelt and TSolid significantly influence the predicted mass balance B by determining the months which are taken into account in the calculation.
+
+Both TMelt and TSolid can be determined by a physical reasoning: we know that both snow melts and precipitation becomes solid at around 0∘C. Hence, the two thresholds TMelt and TSolid are within a natural range that depends on the climatological conditions at a specific glacier site.
+
+In OGGM, TMelt and TSolid are constants and you can access the default values via the cfg module:
+
+Similarly, you can use your own TMelt and TSolid if you feel like it:
+
+The temperature sensitivity μ∗ is glacier specific and mostly determined using statistical error minimization techniques, e.g. ordinary least squares (OLS). Such statistical techniques are very sensitive to the sample size - a general issue in glaciology is that the sample size of annual mass balance records is poor for many glaciers.
+
+However, assume that a 100 year long mass balance record together with temperature and precipitation measurements is available for a specific glacier (this is a best case example and only very few glaciers actually have such long records). OLS will find a statistically significant μ∗ which you can happily use to model mass balance. But what happens if you only use 30 years out of the 100 year record? OLS will find another statistically significant μ∗ that is different from the one determined by the 100 year record - and another statistically significant μ∗ can be found for each reasonable subset of the original 100 year record. This implies that μ∗ is generally a time dependent temperature sensitivity μ∗(t).
+
+For this reason, OGGM implements a calibration procedure, introduced by Marzeion et al., (2012), to determine a constant glacier specific μ∗ out of the time dependent μ∗(t) candidates. This calibration is beyond the scope of this notebook and you can read about it in detail here and check out an example implementation in OGGM here.
+
+Implementation in OGGM
+First, we need to define a glacier directory:
+
+If you want to look at your model domain, you can plot it using:
+
+In OGGM, the calibrated temperature index model for each glacier is accessible via the PastMassBalance class of the massbalance module:
+
+In this case,
+
+and its calibrated temperature sensitivity μ∗ is
+
+Similarly, the residual ϵ is
+
+Climate data
+Per default, the temperature index model is driven by the 0.5∘×0.5∘ gridded global CRU TS climate dataset. These climate data are then downscaled to a higher resolution grid to allow for an elevation-dependent dataset. The climate data at the reference height used to drive the temperature index model and to determine the calibrated μ∗ of the selected glacier can be accessed via the glacier directory:
+
+This is the temporary path where OGGM stored its climate data on your machine. You can read the climate data using xarray:
+
+The climate dataset has two variables, the monthly total precipitation prcp and the monthly average temperature temp. Let's calculate the mean annual cycle of average temperature and total precipitation,
+
+and plot it, to get an intuitive view on the climate conditions at the selected glacier site.
+
+Reference mass balance data
+OGGM uses in-situ mass balance data from the World Glacier Monitoring Service Fluctuations of Glaciers Database (WGMS FoGD). The Fluctuations of Glaciers (FoG) database contains annual mass-balance records for several hundreds of glaciers worldwide. Currently, 254 mass balance time series are available.
+
+These data are shipped automatically with OGGM and can be accessed via the glacier directory:
+
+Predict mass balance!
+Now, we are set to calculate glacier mass balance using the temperature index model - we have the model parameters μ∗ and ϵ, the thresholds for melt and solid precipitation TMelt and TSolid and the climate dataset. The last thing we need to define are the heights at which we want to calculate the mass balance. Here, we use glacier flowlines along which the mass balance is computed:
+
+We will calculate the specific mass balance in mm w.e. yr−1 for the years where in-situ mass balance data is available:
+
+The specific mass balance along the given flowlines is computed by
+
+For this calculation we assumed an average ice density of
+
+Now, we can compare the actual in-situ mass balance with the modelled mass balance:
+
+Does not look too bad, does it? To assess model performance, it is helpful to plot the data in a scatter plot:
+
+If the points were aligned along the red line, the model would perfectly predict mass balance. Generally, the model overestimates mass balance in magnitude - the scatter plot shows a steeper slope than the 1 to 1 red line. This is due to specific mass balance beeing dependent not only on the climate but also on the glacier surface area.
+
+OGGM computes the specific mass balance as a glacier area-weighted average using a constant glacier geometry fixed at the Randolph Glacier Inventory date, e.g. 2003 for most glaciers in the European Alps. Glacier geometry is itself a function of climate and may change significantly over time. Hence, assuming a constant glacier geometry over a time period of different climatic conditions can result in a systematic model bias:
+
+The bias is positive at the beginning of the in-situ measurements and shows a negative trend. When keeping the glacier area constant, a positive (negative) bias means, that the calibrated temperature sensitivity μ∗ of the glacier is too low (high) during time periods of colder (warmer) climates. You can find a simple experiment about the sensitivity of the specific mass balance on climate change and glacier surface area in this blog post.
+
+Take home points
+There are two different types of melt models: the energy balance model and the temperature index model
+The temperature index model is the computationally efficient simplification of the energy balance model
+Temperature index models assume an empirical relationship between air temperature and melt rates
+Temperature index models can be extended to model glacier mass balance by adding solid precipitation as a model parameter
+The model outcome is significantly influenced by the choice of TMelt and TSolid
+The temperature sensitivity of a glacier is not constant in time μ∗ = μ∗(t)
+The specific mass balance is a function of the climate and the glacier surface area
+References
+Hock R., (2003). Temperature index melt modelling in mountain areas. Journal of Hydrology, 281, 104-115. https://doi.org/10.1016/S0022-1694(03)00257-9
+Marzeion B., Jarosch A. H. & Hofer M. (2012). Past and future sea-level change from the surface mass balance of glaciers. The Cryosphere, 6, 1295-1322. https://doi.org/10.5194/tc-6-1295-2012
