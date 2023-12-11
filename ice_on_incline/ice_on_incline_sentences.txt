@@ -1,0 +1,115 @@
+Ice on an incline
+This activity can be run by students after a live experiment with "glacier goo" used on various slopes. In this notebook, we use a numerical simulation to study the difference in ice flow between bed of various slopes.
+
+First, we set up the tools that we will use. You won't need to modify these.
+
+The essentials
+Now we set up our first slope and tell the model that we want to study a glacier there. We will keep things simple: a constant slope, constant valley width, and simple formulation for adding and removing ice according to altitude.
+
+The glacier bed
+
+We will use a helper function to create a simple bed with a constant slope. This requires as input a top and bottom altitude, and a width.
+
+We have to decide how wide our glacier is. For now, we will use a default RectangularBedFlowline shape with an initial_width width of 300 m. The "rectangular" cross-sectional shape means that the glacial "valley" walls are straight and the width w is the same throughout:
+
+In this image, the black lines signify the walls of the "valley". The blue line shows the surface of the glacier.
+
+What do you think *h* means in the picture? Click for details
+We set up a glacier bed with the specified geometry:
+
+Let's plot the bed to make sure that it looks like we expect. The GlacierBed object has a built in method for this which provide us with a side and top-down view of the glacier domain.
+
+Check out the glacier bed length. How do you think that the length is computed out of the parameters above? Click for details
+We have now defined an object called GlacierBed and assigned it to the variable bed, which stores all the information about the bed geometry that the model uses.
+
+Notice that bed does not include any information about the ice. So far we have only set up a valley. We have defined its slope, its width, its transverse shape - the geometry of the habitat where our glacier will grow. Now we want to add the climate processes that will put ice into that habitat.
+
+Adding the ice
+Now we want to add ice to our incline and make a glacier. Glaciologists describe the amount of ice that is added or removed over the entire surface of the glacier as the "mass balance". Here's an illustration from the OGGM-edu website:
+
+A linear mass balance is defined by an equilibrium line altitude (ELA) and a mass balance gradient with altitude (in [mm m−1]). Above the ELA, we add ice (from snow) and below the line we remove ice (melting it). We will learn more about this in the accumulation and ablation notebook.
+
+The mass balance model mb_model gives us the mass balance for any altitude we want. We will plot it below.
+
+Glacier initialisation
+
+We can now take our bed and the mass balance and create a glacier which we can then perform experiments on.
+
+Similarly to the bed, the Glacier object is storing some information that we can recover just by calling it:
+
+Since we just created the glacier, there's still no ice! We need some time for ice to accumulate. For this, the mass balance is the relevant process:
+
+What did you notice in the graph? What are the axes? At what altitudes is ice added to the glacier (positive mass balance)? At what altitudes does ice melt?
+
+Running the numerical model
+When we did our experiments in the laboratory, we had a slope and some material to pour our "glacier". We also decided how long to let the goo flow -- that is, the "runtime" of our experiment. Setting up our glacier model on the computer is very similar. We have gathered our bed geometry (bed), our mass balance (mb_model), and now we will tell the model how long to run (runtime).
+
+First we run the model for one year:
+
+Let's take a look. The Glacier object also has a built-in method for us to plot.
+
+Here we can see that there is a very thin cover of ice from the top and partway down the glacier bed. Study both plots and interpret what they are showing. How far down the glacier bed does the ice cover reach?
+
+We can also take a look at some of statistics of the glacier again to get some more details:
+
+The modeled "glacier" already reaches down to the ELA (dashed line)...but it is extremely thin. Looks like we need some more time for the glacier to grow.
+
+Let's now run the model for 150 years.
+
+In the following code, can you identify where we tell the model how many years we want to study?
+
+Let's see how our glacier has changed.
+
+Now we can clearly see the difference between the surface of the glacier and the bedrock. Let's print the same set of statistics about the glacier as before:
+
+Compare this "numerical glacier" with the "glacier goo" we made in the lab:
+
+How long does it take for the glacier goo to "grow" and flow down the slope? How long does the numerical glacier need?
+Below the ELA (3000 m) something happens for the numerical glacier (and for real glaciers too) that did not happen in the glacier goo experiment. What is it?
+If we want to calculate changes further in time, we have to set the desired date.
+
+Try editing the cell below to ask the model to run for 500 years instead of 150.
+
+Based on this information, do you think you modified the cell correctly?
+
+It is important to note that the model will not go back in time. Once it has run for 500 years, the model will not go back to the 450-year date. It remains at year 500. Try running the cell below. Does the output match what you expected?
+
+Accessing the glacier history
+Lucky for us, the Glacier object has also been storing a history of how the glacier has changed over the simulation. We can access that data through the history:
+
+And we can quickly visualise the history of the glacier with the .plot_history() method
+
+What is going on in this image?
+
+The length of the glacier is a step function in the first year of simulation because, above the equilibrium line altitude (ELA), only accumulation is happening. After that, at first the length of the glacier remains constant. The ice is not very thick, so the portion that reaches below the ELA does not survive the melting that occurs there. But no matter how thick the glacier is, the part above the ELA is always gaining mass. Eventually, there is enough ice to persist below the ELA. We will learn more about ELA in the accumulation and ablation notebook.
+
+Equilibrium state
+
+After several centuries, the glacier reaches a balance with its climate. This means that its length and volume will no longer change, as long as all physical parameters and the climate stay roughly constant. The Glacier object has a method which can progress the glacier to equilibrium .progress_to_equilibrium(). More on this in later notebooks.
+
+Can you identify an equilibrium state in the plots above?
+
+A first experiment
+Ok, we have seen the basics. Now, how about a glacier on a different slope? Glaciers are sometimes very steep, like this one in Nepal.
+
+Let's adjust the slope in the model to observe a steeper glacier:
+
+In the following code, can you identify where we tell the model the new slope we are going to use?
+
+What slope did we use for the first experiment? Look for that information at the beginning of the notebook.
+
+Comparing glaciers
+We can now introduce the GlacierCollection. This is a utility which can store multiple glaciers and can be used to easily compare and run experiments on multiple glaciers.
+
+We can get a quick look at the collection by simply calling it:
+
+Before we compare the glaciers in the collection, let's make sure to progress them to the same year with the .progress_to_year() method.
+
+Now let's compare the glacier we studied first with our new glacier on a different slope. Do you think the new glacier will have more or less ice than the first?
+
+Let's make sure we understand what is going on:
+
+Explore the characteristics (thickness, length, velocity...). Can you explain the difference between the two glaciers? Click for details
+Activity
+
+Now, try to change the slope to another value, and run the model again. What do you see?

@@ -1,0 +1,96 @@
+Getting started with OGGM Edu: idealised glaciers
+OGGM Edu provides a simple way to experiment with glaciers on your computer. This is achieved by a high level interface to the different parts of the complex glacier model that is OGGM. You as a user will interact with a few objects that provide you with methods and attributes fitting for a glacier and the parts that make it up.
+
+The goal of this notebook is to introduce you to OGGM Edu and how it can be used to simulate two idealised glaciers.
+
+We begin by importing the classes that we need
+
+Getting started with OGGM Edu: idealised glaciers
+OGGM Edu provides a simple way to experiment with glaciers on your computer. This is achieved by a high level interface to the different parts of the complex glacier model that is OGGM. You as a user will interact with a few objects that provide you with methods and attributes fitting for a glacier and the parts that make it up.
+
+The goal of this notebook is to introduce you to OGGM Edu and how it can be used to simulate two idealised glaciers.
+
+We begin by importing the classes that we need
+
+Let's plot the bed to make sure that it looks like we expect. The bed object has a built in method for this which provide us with a side and top-down view of the glacier domain.
+
+For finer control over the bed slope you can pass a single value to slopes during the creation
+
+You can also pass a sequence of slope angles in slopes - for this you also need to specify the altitude spans of the sections with the slope_sections argument.
+
+There should be one more entry in slope_sections compared to the entries in slopes. The first and last value in slope_sections should match the top and bottom of the glacier.
+
+Mass balance
+
+For the glacier to grow it needs a mass balance model. The mass balance is responsible for adding snow and removing ice through melt on the glacier. In our case it will be a simple linear mass balance, meaning that it decreases linearly with altitude.
+
+The mass balance is defined by the equilibrium line altitude (ELA) and the altitude gradient (in mm yr − 1 m−1). The ELA defines at what altitude the mass balance is zero and the altitude gradient how much the mass balance changes with altitude. More on this in upcoming notebooks!
+
+We set the ELA of our glacier to 3000 meters and the altitude gradient to 4 mm yr − 1m−1.
+
+Glacier initialisation
+
+We can now take our bed and the mass balance and create a glacier which we can then perform experiments on.
+
+Similarly to the bed, we can get some statistics about the glacier by simply calling it. However since we just created the glacier, everything will be zero.
+
+Progressing the glacier
+
+Now the glacier has all the ingredients needed to evolve.
+
+Let's first progress the glacier to year 1.
+
+And let's take a look at the glacier. As the bed, it has a in method for this.
+
+Here we can see that there is thin cover of ice from the top and 4 km down the glacier bed. So the glacier almost reaches the point where the bed intersects the ELA (~4 km). We can also take a look at some of statistics of the glacier again to get some more details:
+
+From the statistics we can read that the glacier has a length of 4 km and covers an area of 1.2 km2. The glacier will grow considerably in the upcoming years, and the ice thickness should become apparent even in the altitude - distance plot. Let us progress the glacier to year 150 and take a look.
+
+Now we can clearly see the difference between the surface of the glacier and the bedrock. Let's print the same statistics about the glacier as before:
+
+The glacier length and area has increased by ~20% while the volume has increased by more than 1000%. This is because the glacier has to build enough mass (i.e. ice thickness) before it can begin to flow downhill and increase its length.
+
+Note that the glacier is now 150 years old. If we try progressing the glacier to the same year again, nothing will happen. It evens gives us a warning.
+
+We can easily progress the glacier even longer:
+
+The glaciers has now grown considerably further down our made up mountain, well below the ELA.
+
+It is important to note that the model can not progress back in time. Once at year 500, we can not de-age the glacier.
+
+Let's do the same with one of the glaciers with a non-linear bed profile!
+
+Glacier history
+
+This brings us to the glacier history. This is just what it sounds like, a history of the length, volume and area of the glacier. We can access the data through the .history attribute
+
+And we can quickly visualise the history of the glacier with the .plot_history() method
+
+The glacier length and area has a step in the first year. This has to do with how OGGM internally deals with snow and ice, it does not differentiate between them. And since the mass balance is always positive above the ELA, any snowfall in the first year above the ELA will remain and be classified as part of the glacier, and contribute to the length and area.
+
+This is why after the first year, the glacier's length and area remains constant for a few years. In this initial stage, the ice is so thin that any flow bringing ice below the ELA will not be large enough to compensate for the high ablation rate, and any ice melts away.
+
+When the ice thickness has increased enough for the ice flow to surpass the ablation rate below the ELA, the glacier length can begin to increase.
+
+Equilibrium state
+
+After several centuries, the glacier reaches a balance with its climate. This means that its length and volume won't change anymore, as long as all physical parameters and the climate stay constant. The Glacier has a method which progress the glacier to equilibrium .progress_to_equilibrium(), more on this in later notebooks.
+
+A first experiment
+We have now seen how to setup a simple glacier and progress it to any year. Now we will move a little bit closer to reality and define a glacier with changing widths. Like many real glaciers the new glacier will be wider at the top (in the accumulation area) and have a constant width below the ELA.
+
+We can achieve this by creating a new Bed and instead of specifying the top and bottom altitudes along with the width, we specify altitudes and widths in pairs:
+
+Here the first and last values in altitudes and widths correspond to the top/bottom altitude/width. Any values in between will change the shape of the bed further.
+
+We use the new bed to create a new glacier
+
+We can now introduce the GlacierCollection. This is a utility which can store multiple glaciers and can be used to easily compare and run experiments on multiple glaciers. The GlacierCollection will be used extensively throughout these notebooks and its functionality will be explained further as we go along.
+
+We can get a quick look at the collection by simply calling it
+
+Before plotting the glaciers in the collection, we can progress them to the same year with the .progress_to_year() method.
+
+We can then plot the collection
+
+Similarly to the glacier the collection has a method for easily plotting the histories of the held glaciers.

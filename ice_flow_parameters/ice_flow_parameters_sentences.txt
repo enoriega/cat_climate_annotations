@@ -1,0 +1,38 @@
+Influence of ice flow parameters on glacier size
+Goals of this notebook:
+
+The student will be able to create a glacier and change Glen's creep parameter and basal sliding parameter.
+The student will be able to explain the influences of the two parameters on glacier shape.
+The motion of glaciers is determined by two main processes: One is internal deformation of ice due to gravity and the other is basal sliding. These processes can be described by parameters. In this notebook we will examine their influence on glaciers.
+
+First, we have to import the relevant classes from OGGM Edu
+
+Let's create a glacier
+
+Glen's creep parameter
+We start with looking at the internal deformation of the ice, which results in so called creeping. To describe it we use Glens's creep parameter. Our glacier, and OGGM, defaults to set Glen's creep parameter to the "standard value" defined by Cuffey and Paterson, (2010): 2.4 ⋅ 10−24. We can check this by accessing the .creep attribute
+
+The parameter relates shear stress to the rate of deformation and is assumed to be constant. It depends on crystal size, fabric, concentration and type of impurities, as well as on ice temperature (Oerlemans, 2001) (you can find a more detailed description of it here).
+
+Next we will change the creep parameter and see what happens. An easy way to do this is to create a GlacierCollection and change the creep parameter for some of the glaciers in the collection. Here we will also introduce the .fill() method of the GlacierCollection, which is useful to quickly create a collection with multiple glaciers.
+
+We can then change the creep parameter of the glaciers within the collection
+
+And progress the glaciers within the collection to year 800:
+
+And plot the collection
+
+Sliding parameter
+Basal sliding occurs when there is a water film between the ice and the ground. In his seminal paper, Hans Oerlemans uses a so-called "sliding parameter" representing basal sliding. For our glacier this parameter is available under the .basal_sliding attribute. By default it is set to 0, but it can be modified
+
+Change the basal sliding parameter of one of the glaciers in the collection to 5.7 ⋅ 10 − 20 and progress the collection
+
+Take a look at the glaciers
+
+Initially the glacier with higher basal sliding is advancing down the bed quicker compared to the glacier without basal sliding. However, at a certain point in time the larger volume of Glacier 0 lead to a stronger ice flow, and the glacier can extend further down.
+
+If you want to learn more about the processes of glacier flow, we recommend to go through these two pages:
+
+Deformation and sliding
+Stress and strain
+In the documentation of OGGM you find also information about the theory of the ice flow parameters and the application.

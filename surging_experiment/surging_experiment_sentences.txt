@@ -1,0 +1,32 @@
+Glacier surging experiments
+Goals of this notebook:
+
+Learn how to set up a surging glacier using OGGM-Edu.
+Understand and describe the effects of glacier surging.
+In this notebook we are going to explore surging glaciers and how we can experiment with them using OGGM-Edu.
+
+What is a glacier surge?
+
+A small percentage of glaciers undergo short periods of faster flow. They experience a change in morphology and surface characteristics, which sometimes leads to a marked frontal advance. The speed of the ice increases up to 10 - 1000 times of the normal velocity. Record flows are observed with velocities that exceed 100m per day. Surges happen in decadal cycles and can last for 1 up to 15 years.(Jiskoot, 2011)
+
+We start with importing the necessary classes:
+
+Basics
+We set up a glacier with a linear bedrock and variable width (see Intro notebook) as a setting for our experiment.
+
+We can then define a surging glacier using the SurgingGlacier class
+
+The surging glacier is essentially the same as a Glacier but with some added attributes, namely the .normal_years , .surging_years and the .basal_sliding_surge. By default these are set to 50 years of non-surging and 5 years of surging, with a basal sliding during a surge 10 times higher then when not surging. These can easily be changed by the user after initialisation.
+
+There are also some changes to how the progression works, and it is not possible to progress a surging glacier to equilibrium.
+
+When we progress this glacier the basal sliding will be increased every 50 years resulting in an increased ice flow.
+
+To learn more about ice flow parameters, take a look at this notebook.
+
+In the plot above we can distinguish the surging periods as a rapid expansion in both length and area (also marked in orange).
+
+Surging glacier experiment
+We can compare this to a non-surging glacier. For this we will again employ the glacier collection.
+
+Next we can create a glacier with a stronger surge, add this to the collection and compare it to the two previous glaciers.

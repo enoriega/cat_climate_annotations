@@ -1,0 +1,74 @@
+Mass balance gradients (MBG) and their influence on glacier flow
+In the intro notebook we touched briefly on the mass balance gradient of a glacier. This is what we are going to take a closer look at now. If the concept of mass balance is completely new to you, have a short read about it here, up to the paragraph "So what is Glacier Mass Balance?". In this notebook we will set up a few simple glaciers to further explore what characteristics of glaciers change with different mass balance gradients. We will also take a look at the topics of volume and response time.
+
+Goals of this notebook:
+
+The student will be able to explain the terms:
+Mass balance gradient,
+Equilibrium state
+Response time.
+First, we have to import the relevant classes
+
+Initialising the glacier
+
+We start by setting up a simple glacier with a linear bedrock (see Getting started with OGGM Edu) to generate a starting point for our experiment.
+
+Changing the mass balance gradient (MBG)
+
+The MBG is defined as the change of the mass balance with altitude ¹. It depends strongly on the climate at the glacier ².
+
+Let's take a look at the effects of the MBG by creating a few glaciers with different gradients. In the intro notebook our glacier had a gradient of 4 mm/m so lets add a glacier with a weaker gradient and one with a stronger gradient.
+
+We will again make use of the GlacierCollection to quickly progress and visualise the glaciers.
+
+Creating a complex mass balance profile
+
+It is also possible to create a more complex mass balance profile. This is achieved by passing a list of gradients, and another list with the altitude of the breakpoints between them.
+
+A stronger mass balance gradient (flatter line in plot above) implies a larger change of the mass balance with altitude. We can see this in the plot above: The annual mass balance hardly changes with altitude for the glacier with the weakest mass balance gradient (blue) while there is a considerable difference between the top and bottom annual mass balance for the glacier with the strongest mass balance gradient (green).
+
+This in turn affects the growth of the glacier. A strong mass balance gradient implies that more ice is added to the accumulation zone while more ice is removed from the ablation zone each year compared to a glacier with a weaker gradient. This results in a greater ice flux and the glacier thus grows faster. This is why the glacier with the strongest gradient exhibits the largest growth during our experiments (Green glacier in Collection plot above).
+
+What do you think: where do we find glaciers with high MBGs? Click for details
+Equilibrium state
+Glaciers change their geometry as a way to adapt to the climate³. If the accumulation increases, the glacier will grow further down below the ELA to increase the ablation. Similarly, if the temperature rises and the ablation increases, the glacier length will decrease. If the climate remains constant for a long enough time, glaciers will reach an equilibrium state with its climate, where the accumulation = ablation ⁴.
+
+With this in mind, we will take a look at how fast our glaciers, with different gradients, reach this state and compare their shapes:
+
+The different glaciers reach their equilibrium state after a different number of years. What does the figure show us? Which glacier is the thickest and longest? Let's look at specific numbers:
+
+The glacier with the strongest gradient reaches the equilibrium state first. This is also the largest and longest glacier.
+
+Response time
+
+The glacier response time is the period of time a glacier needs to adjust its geometry to changes in mass balance caused by climate change and reach a new equilibrium state. There are a some different definitions for its calculation, OGGM-Edu use the definition from Oerlemans (see formula below) ⁵.
+
+A OGGM-Edu glacier has an attribute .response_time which is calculated based on difference between the last two equilibrium states in the glacier history. So far we've only showed you how to progress a glacier to equilibrium, but not how to leave it and reach a second one. This will be the first step to getting the response time of a glacier.
+
+We use the glacier from the start of the notebook.
+
+First we progress the glacier to equilibrium
+
+We can access the stored equilibrium states of a glacier
+
+Now we want to set up a climate change scenario for the glacier. This is easily done with the .add_temperature_bias method. This method takes a desired temperature bias (+/−) and a duration, which specifies how long it will take for the glacier to reach the climate state. For instance, if we set the bias to 1. and the duration to 50, it will take 50 years for the climate to become 1 degree warmer.
+
+When a glacier has a climate change scenario the progress_ methods will internally work a little bit differently, but this is not anything you will notice.
+
+Since we are purely interested in the response of the glacier, we create a climate change scenario with the duration of 1 year.
+
+The next step is to calculate the response times for our glaciers. One could think that it is as simple as looking at the years above and do a simple subtraction. However this is not the case! In reality the rate at which a glacier changes is ever decreasing and a complete equilibrium state is never really achieved. Because of this the response time is considered the time it has taken the glacier to complete most of the adjustment, more specifically all but a factor of 1/e.
+
+For numerical models like our glaciers it is common to use the volume response time, from Oerlemans: τ = t(V = V2 −V 2 − V1e) where V1 and V2 corresponds to the glacier volume at the initial and new equilibrium state respectively.
+
+Luckily this is done by our glacier object, so we can just take look at the .response_time attribute
+
+or just look at the representation
+
+Now that we have introduced the concept of response time we can apply it and see how the different mass balance gradients affect the response time. For this we need a new collection.
+
+We then have to set up a climate change scenario for the glaciers in the collection
+
+We can also look at the state history for one of the glaciers
+
+The glacier with weakest MBG need the longest time to adjust to a changed climate compared to the other glaciers. On the other hand, the glacier with the strongest gradient only needs a around two decades to adjust its shape to the new climate (A real world example: Franz Josef glacier in New Zealand⁶)⁷. The response time of glaciers with weak gradients is in reality much longer than 200 years, actually closer to 2000 years.
